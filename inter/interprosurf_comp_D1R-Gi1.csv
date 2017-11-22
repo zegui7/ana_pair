@@ -1,0 +1,9 @@
+chain,A,B,AB
+polar_area_energy,4705.84,8422.64,11958.08
+apolar_area_energy,13015.16,12443.15,23486.88
+total_area_energy,17721.00,20865.79,35444.96
+no_surf_atoms,1515,1843,3259
+no_buried_atoms
+,956
+,989
+,2044
