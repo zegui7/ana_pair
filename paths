@@ -1,0 +1,6 @@
+CHROME_DRIVER=r'D:\MEGA_Backup\Google Drive\MastersThesis\Z_OTHER\DRIVERS\chromedriver.exe'
+PHANTOM_DRIVER=r'D:\MEGA_Backup\Google Drive\MastersThesis\Z_OTHER\DRIVERS\phantomjs.exe'
+VMD_PATH='vmd'
+R_PATH='Rscript'
+CLUSTALO_PATH=r'clustal-omega-1.2.2-win64\clustalo.exe'
+SCRIPT_PATH=r'scripts'

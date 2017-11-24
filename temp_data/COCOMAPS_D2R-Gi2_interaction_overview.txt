@@ -1,5 +1,0 @@
-Number of interacting residues Molecule1 73
-Number of interacting residues Molecule2 77
-Number of hydrophilic-hydrophobic interaction 146
-Number of hydrophilic-hydrophilic interaction 187
-Number of hydrophobic-hydrophobic interaction 59
