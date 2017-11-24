@@ -861,7 +861,7 @@ class AllComplexes():
 				if len(self.thread_dict) < 1 and pdb not in self.submitted:
 					self.thread_dict[pdb] = self.get_complex(pdb)
 					self.submitted.append(pdb)
-			time.sleep(1)
+			time.sleep(1) 
 
 q = queue.Queue()
 #AllComplexes(download_path = 'temp_data',inter_path = 'inter', output_path = 'output',
