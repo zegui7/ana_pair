@@ -29,7 +29,7 @@ import os
 import shutil
 import argparse
 import sys
-from glob import glob,iglob
+from glob import glob
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import toolz
@@ -69,8 +69,7 @@ RES_CODES = [('CYS', 'C'), ('ASP', 'D'), ('SER', 'S'), ('GLN', 'Q'),
              ('PHE', 'F'), ('ASN', 'N'), ('GLY', 'G'), ('HIS', 'H'),
              ('LEU', 'L'), ('ARG', 'R'), ('TRP', 'W'), ('ALA', 'A'),
              ('VAL', 'V'), ('GLU', 'E'), ('TYR', 'Y'), ('MET', 'M'),
-             ('MSE', 'M'), ('SOC', 'C'), ('CYX', 'C'), ('HID', 'H'),
-			 ('HIE', 'H'), ('HIP', 'H')]
+             ('MSE', 'M'), ('SOC', 'C')]
 
 RES_CODES_DICT = dict(RES_CODES)
 
@@ -101,21 +100,6 @@ def thread_maker(func):
 		return thread
 	return thread_sub
 
-def get_paths():
-	paths = []
-	with open('paths','r') as o:
-		lines = o.readlines()
-		for line in lines:
-			data = line.split('=')
-			paths.append(data[1])
-	CHROME_DRIVER = paths[0]
-	PHANTOM_DRIVER = paths[1]
-	VMD_PATH = paths[2]
-	R_PATH = paths[3]
-	CLUSTALO_PATH = paths[4]
-	SCRIPT_PATH = paths[5]
-	return paths
-
 #Classes
 
 class Complex():
@@ -138,7 +122,6 @@ class Complex():
 		self.identifier = self.get_id()
 		self.thread_dict = {}
 
-		self.folder = SYS_SEP.join(self.pdb.split(SYS_SEP)[:-1])
 		self.atoms = toolz.pipe(self.pdb,self.open_lines,self.get_atoms)
 		self.chains = self.get_chains()
 		self.pdb2fasta(True)
@@ -426,6 +409,7 @@ class Complex():
 
 	def vmd_path_normalizer(self):
 		self.vmd_path = self.pdb.replace('\\','/')
+		self.vmd_path = self.pdb.replace('\\','/')
 
 	def run_vmd(self,script):
 		os.system(' '.join([VMD_PATH,'-dispdev none -nt -e',script,'-args',
@@ -433,8 +417,7 @@ class Complex():
 
 	def process_saltbr(self):
 		data = []
-		path = SYS_SEP.join([self.folder,"saltbr_output",
-							 self.identifier,"*.dat"])
+		path = SYS_SEP.join(["saltbr_output",self.identifier,"*.dat"])
 		all_saltbr = glob(path)
 		for saltbr in all_saltbr:
 			x = saltbr[:-4]
@@ -452,8 +435,7 @@ class Complex():
 
 	def process_sasa(self):
 		data = []
-		path = SYS_SEP.join([self.folder,"sasa_hb",
-							 "sasa_" + self.identifier + ".log"])
+		path = SYS_SEP.join(["sasa_hb","sasa_" + self.identifier + ".log"])
 		rl = self.open_lines(path)
 		for line in rl:
 			spl = line.split()
@@ -463,8 +445,7 @@ class Complex():
 
 	def process_hbonds(self):
 		data = []
-		path = SYS_SEP.join([self.folder,"sasa_hb",
-							 "hb_" + self.identifier + ".log"])
+		path = SYS_SEP.join(["sasa_hb","hb_" + self.identifier + ".log"])
 
 		def get_id(string):
 			temp = string.split('-')
@@ -484,9 +465,7 @@ class Complex():
 
 	def run_r(self,script,arguments):
 		arguments_ready = ' '.join(arguments)
-		print(' '.join([R_PATH,script,arguments_ready,'> nul']))
 		os.system(' '.join([R_PATH,script,arguments_ready,'> nul']))
-
 
 	#Wrapers
 
@@ -639,18 +618,20 @@ class AllComplexes():
 	structures
 	"""
 
-	def __init__(self,download_path = 'temp_data',inter_path = 'inter',
-				 output_path = 'output',ana_type = "family",**kw):
+	def __init__(self,folder,download_path = 'temp_data',inter_path = 'inter',
+				 output_path = 'output',ana_type = "family"):
 		self.download_path = download_path
 		self.inter_path = inter_path
 		self.output_path = output_path
-		self.folder = kw["folder"]
+		self.folder = folder
 		self.ana_type = ana_type
 
 		self.complexes = {}
 		self.thread_dict = {}
+		self.consurf_thread_dict = {}
+		self.monomer_1_partners = {}
+		self.monomer_2_partners = {}
 		self.consurf_submitted = []
-		self.submitted = []
 
 		print("Downloads will be stored in " + self.download_path + '.')
 		print("Intermediate files will be stored in " + self.inter_path + '.')
@@ -658,22 +639,16 @@ class AllComplexes():
 
 		self.create_folders()
 		if ana_type == "family":
-			self.consurf_thread_dict = {}
-			self.monomer_1_partners = {}
-			self.monomer_2_partners = {}
 			self.get_pdbs()
 			self.get_combinations()
-			self.get_complexes_family()
+			self.get_complexes()
 			self.align_wraper()
 			while len(self.consurf_thread_dict) > 0:
 				self.consurf_thread_dict = self.check_thread_dict(self.consurf_thread_dict)
 				time.sleep(60)
 
 		elif ana_type == "trajectory":
-			self.coordinates = self.folder + SYS_SEP + kw["coordinates"]
-			self.trajectory = self.folder + SYS_SEP + kw["trajectory"]
-			self.split_trajectory()
-			self.get_complexes_trajectory()
+			pass
 
 		elif ana_type == "ensemble":
 			pass
@@ -712,6 +687,9 @@ class AllComplexes():
 
 	@thread_maker
 	def get_complex(self,file):
+		#This builds a list that will be essentially 'built' on, with chains and
+		#etc.
+		#The format is going to be
 		pdb = file.replace('.pdb','')
 		pdb = pdb.split(SYS_SEP)[-1]
 		sep_ids = pdb.split('-')
@@ -733,7 +711,8 @@ class AllComplexes():
 					   if thread_dict[thread].handled == False}
 		return thread_dict
 
-	def get_complexes_family(self): #wraper for the family method
+	def get_complexes(self):
+		self.submitted = []
 		#This submits to everything to Consurf
 		for pdb in self.all_pdbs:
 			id1,id2 = pdb[:-4].split(SYS_SEP)[-1].split('-')
@@ -791,81 +770,5 @@ class AllComplexes():
 						  self.inter_path + SYS_SEP + 'monomer_2_aln.fasta')
 		print("Monomer pairs have been aligned.")
 
-	#trajectory-related scripts
-
-	def split_trajectory(self):
-		def run_vmd(script,arguments):
-			os.system(' '.join([VMD_PATH,'-dispdev none -nt -e',script,'-args',
-								arguments, '> nul']))
-		def get_id():
-			return self.coordinates[:-4].split(SYS_SEP)[-1]
-
-		arguments = ' '.join([
-		self.coordinates,
-		self.trajectory,
-		get_id(),
-		self.inter_path
-		])
-
-		run_vmd(SYS_SEP.join([SCRIPT_PATH,"frame2pdb.tcl"]),arguments)
-
-	def get_complexes_trajectory(self):
-		def run_r(script,arguments):
-			arguments_ready = ' '.join(arguments)
-			os.system(' '.join([R_PATH,script,arguments_ready,'> nul']))
-
-		def process_chains():
-			with open("chains","r") as o:
-				lines = o.readlines()[1:]
-			lines = [x.replace('"','') for x in lines]
-			lines = [x.split()[1] for x in lines]
-			return lines
-
-		def correct_chains(file):
-			with open(file,'r') as o:
-				lines = o.readlines()
-				o.close()
-			new_lines = [lines[0]]
-			for index,line in enumerate(lines[1:]):
-				if index > len(chains) - 1:
-					chain_index = len(chains) - 1
-				else: chain_index = index
-				if chains[chain_index] != 'X':
-					line = line[:21] + chains[chain_index] + line[22:]
-					new_lines.append(line)
-			return ''.join(new_lines)
-
-		self.pdb_path = SYS_SEP.join([os.getcwd(),self.inter_path,
-									  'all_frames','*pdb'])
-		self.all_pdbs = glob(self.pdb_path)
-
-		#this is essentially to add chains to unformatted files coming from
-		#molecular dynamics.
-
-		run_r(SCRIPT_PATH + SYS_SEP + "get_chains.R",
-			  [SYS_SEP.join([os.getcwd(),self.inter_path,"all_frames"])])
-		chains = process_chains()
-		consurf_submitted = False
-		while len(self.complexes) != len(self.all_pdbs):
-			self.thread_dict = self.check_thread_dict(self.thread_dict)
-			for pdb in self.all_pdbs:
-				new_file = correct_chains(pdb)
-				if new_file[0:4] == 'CRYS':
-					with open(pdb,'w') as o: o.write(new_file)
-				if consurf_submitted == False:
-					id1,id2 = pdb[:-4].split(SYS_SEP)[-1].split('_')[0:2]
-					chains = list(self.grab_chains(pdb))
-					self.get_consurf(pdb,chains[0],id1)
-					self.get_consurf(pdb,chains[1],id2)
-					consurf_submitted = True
-				if len(self.thread_dict) < 1 and pdb not in self.submitted:
-					self.thread_dict[pdb] = self.get_complex(pdb)
-					self.submitted.append(pdb)
-			time.sleep(1)
-
 q = queue.Queue()
-#AllComplexes(download_path = 'temp_data',inter_path = 'inter', output_path = 'output',
-#			 ana_type = "family",folder = "test_family")
-AllComplexes(download_path = 'temp_data',inter_path = 'inter',
-			 output_path = 'output',ana_type = "trajectory",folder = "test_trajectory",
-			 coordinates = "A21-R1.gro",trajectory = "A21-R1.xtc")
+k = AllComplexes('.')

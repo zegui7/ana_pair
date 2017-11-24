@@ -1,0 +1,16 @@
+[INFO  - 2017-11-22T11:06:48.161Z] GhostDriver - Main - running on port 63267
+[INFO  - 2017-11-22T11:06:50.736Z] Session [3d743a40-cf75-11e7-825c-93987adda392] - page.settings - {"XSSAuditingEnabled":false,"javascriptCanCloseWindows":true,"javascriptCanOpenWindows":true,"javascriptEnabled":true,"loadImages":true,"localToRemoteUrlAccessEnabled":false,"userAgent":"Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1","webSecurityEnabled":true}
+[INFO  - 2017-11-22T11:06:50.737Z] Session [3d743a40-cf75-11e7-825c-93987adda392] - page.customHeaders:  - {}
+[INFO  - 2017-11-22T11:06:50.737Z] Session [3d743a40-cf75-11e7-825c-93987adda392] - Session.negotiatedCapabilities - {"browserName":"phantomjs","version":"2.1.1","driverName":"ghostdriver","driverVersion":"1.2.0","platform":"windows-10-32bit","javascriptEnabled":true,"takesScreenshot":true,"handlesAlerts":false,"databaseEnabled":false,"locationContextEnabled":false,"applicationCacheEnabled":false,"browserConnectionEnabled":false,"cssSelectorsEnabled":true,"webStorageEnabled":false,"rotatable":false,"acceptSslCerts":false,"nativeEvents":true,"proxy":{"proxyType":"direct"}}
+[INFO  - 2017-11-22T11:06:50.737Z] SessionManagerReqHand - _postNewSessionCommand - New Session Created: 3d743a40-cf75-11e7-825c-93987adda392
+[ERROR - 2017-11-22T11:07:37.594Z] Session [3d73ec20-cf75-11e7-9348-9dbe8c231b5d] - page.onError - msg: NotFoundError: DOM Exception 8: An attempt was made to reference a Node in a context where it does not exist.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2017-11-22T11:07:37.595Z] Session [3d73ec20-cf75-11e7-9348-9dbe8c231b5d] - page.onError - stack:
+  insertBefore (https://www.molnac.unisa.it/BioTools/cocomaps/js/script.js:421)
+  checkResult (https://www.molnac.unisa.it/BioTools/cocomaps/js/script.js:421)
+  onload (https://www.molnac.unisa.it/BioTools/cocomaps/view.psp:22)
+
+  phantomjs://platform/console++.js:263 in error
+[INFO  - 2017-11-22T11:07:44.094Z] Session [3d73ec20-cf75-11e7-9348-9dbe8c231b5d] - page.settings - {"XSSAuditingEnabled":false,"javascriptCanCloseWindows":true,"javascriptCanOpenWindows":true,"javascriptEnabled":true,"loadImages":true,"localToRemoteUrlAccessEnabled":false,"userAgent":"Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1","webSecurityEnabled":true}
+[INFO  - 2017-11-22T11:07:44.094Z] Session [3d73ec20-cf75-11e7-9348-9dbe8c231b5d] - page.customHeaders:  - {}

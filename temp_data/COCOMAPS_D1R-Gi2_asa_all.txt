@@ -1,0 +1,14 @@
+Buried area upon the complex formation (A) 3673.2
+Buried area upon the complex formation (%)   9.19
+Interface area (A) 1836.6
+Interface area MOL1 (%)   9.77
+Interface area MOL2 (%)   8.67
+POLAR Buried area upon the complex formation (A) 2273.8
+POLAR Buried area upon the complex formation (%)  61.90
+POLAR Interface area (A) 1136.9
+NO POLAR Buried area upon the complex formation (A<sup>2</sup>) 1399.4
+NO POLAR Buried area upon the complex formation (%)  38.10
+NO POLAR Interface area (A) 699.7
+Residues at the interface_TOT (n) 94
+Residues at the interface_Mol1 (n) 45
+Residues at the interface_Mol2 (n) 49
